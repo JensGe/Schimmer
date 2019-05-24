@@ -1,10 +1,10 @@
 [app]
 
 # (str) Title of your application
-title = Kivy Crash Course 2
+title = Kivy Crash Course 12
 
 # (str) Package name
-package.name = kivycrash2
+package.name = kivycc12
 
 # (str) Package domain (needed for android/ios packaging)
 package.domain = org.test
@@ -36,7 +36,7 @@ version = 0.1
 
 # (list) Application requirements
 # comma separated e.g. requirements = sqlite3,kivy
-requirements = python3,kivy
+requirements = android, kivy
 
 # (str) Custom source folders for requirements
 # Sets custom source for any requirements with recipes
@@ -85,7 +85,7 @@ fullscreen = 0
 #android.presplash_color = #FFFFFF
 
 # (list) Permissions
-#android.permissions = INTERNET
+android.permissions = VIBRATE
 
 # (int) Target Android API, should be as high as possible.
 #android.api = 27
