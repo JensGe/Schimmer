@@ -1,24 +1,56 @@
-from kivy.app import App
+from kivy.uix.label import Label
 
-from kivy.uix.boxlayout import BoxLayout
-from kivy.properties import ListProperty
+from kivy.lang import Builder
+from kivy.base import runTouchApp
 
-import random
+Builder.load_string('''
+
+<RootWidget>:
+    text: 'THE BACKGROUND'
+    font_size: 150
+    Image:
+        source: 'colors.png'
+        allow_stretch: True
+        keep_ratio: False
+    Image:
+        source: 'colors2.png'
+        allow_stretch: True
+        keep_ratio: False
+    Image:
+        source: 'colors.png'
+        allow_stretch: True
+        keep_ratio: False
+''')
 
 
-class ScatterTextWidget(BoxLayout):
+class RootWidget(Label):
 
-    text_color = ListProperty([1, 0, 0, 1])
+    def do_layout(self, *args):
+        number_of_children = len(self.children)
+        width = self.width
+        width_per_child = int(width / number_of_children)
 
-    def change_label_color(self, *args):
-        color = [random.random() for i in range(3)] + [1]
-        self.text_color = color
+        positions = range(0, width, width_per_child)
+
+        for position, child in zip(positions, self.children):
+            child.height = self.height
+            child.x = self.x + position
+            child.y = self.y
+            child.width = width_per_child
+
+    def on_size(self, *args):
+        self.do_layout()
+
+    def on_pos(self, *args):
+        self.do_layout()
+
+    def add_widget(self, widget, index=0, canvas=None):
+        super(RootWidget, self).add_widget(widget)
+        self.do_layout()
+
+    def remove_widget(self, widget):
+        super(RootWidget, self).remove_widget(widget)
+        self.do_layout()
 
 
-class TutorialApp(App):
-    def build(self):
-        return ScatterTextWidget()
-
-
-if __name__ == "__main__":
-    TutorialApp().run()
+runTouchApp(RootWidget())
