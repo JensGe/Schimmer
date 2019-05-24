@@ -1,56 +1,79 @@
-from kivy.uix.label import Label
-
-from kivy.lang import Builder
 from kivy.base import runTouchApp
+from kivy.lang import Builder
+
+from kivy.uix.widget import Widget
+
+from kivy.clock import Clock
+from kivy.animation import Animation
+
+from kivy.properties import ListProperty
+from kivy.core.window import Window
+
+from random import random
 
 Builder.load_string('''
+<Root>:
+    ClockRect:
+        pos: 300, 200
+    AnimRect:
+        pos: 500, 200
 
-<RootWidget>:
-    text: 'THE BACKGROUND'
-    font_size: 150
-    Image:
-        source: 'colors.png'
-        allow_stretch: True
-        keep_ratio: False
-    Image:
-        source: 'colors2.png'
-        allow_stretch: True
-        keep_ratio: False
-    Image:
-        source: 'colors.png'
-        allow_stretch: True
-        keep_ratio: False
+<ClockRect>:
+    canvas:
+        Color:
+            rgba: 1, 0, 0, 1
+        Rectangle:
+            pos: self.pos
+            size: self.size
+
+<AnimRect>:
+    canvas:
+        Color:
+            rgba: 0, 1, 0, 1
+        Rectangle:
+            pos: self.pos
+            size: self.size
 ''')
 
 
-class RootWidget(Label):
-
-    def do_layout(self, *args):
-        number_of_children = len(self.children)
-        width = self.width
-        width_per_child = int(width / number_of_children)
-
-        positions = range(0, width, width_per_child)
-
-        for position, child in zip(positions, self.children):
-            child.height = self.height
-            child.x = self.x + position
-            child.y = self.y
-            child.width = width_per_child
-
-    def on_size(self, *args):
-        self.do_layout()
-
-    def on_pos(self, *args):
-        self.do_layout()
-
-    def add_widget(self, widget, index=0, canvas=None):
-        super(RootWidget, self).add_widget(widget)
-        self.do_layout()
-
-    def remove_widget(self, widget):
-        super(RootWidget, self).remove_widget(widget)
-        self.do_layout()
+class Root(Widget):
+    pass
 
 
-runTouchApp(RootWidget())
+class ClockRect(Widget):
+    velocity = ListProperty([10,15])
+
+    def __init__(self, **kargs):
+        super(ClockRect, self).__init__()
+        Clock.schedule_interval(self.update, 1/60)
+
+    def update(self, *args):
+        self.x += self.velocity[0]
+        self.y += self.velocity[1]
+
+        if self.x < 0 or (self.x + self.width) > Window.width:
+            self.velocity[0] *= -1
+        if self.y < 0 or (self.y + self.height) > Window.height:
+            self.velocity[1] *= -1
+
+
+class AnimRect(Widget):
+    def anim_to_random_pos(self):
+        Animation.cancel_all(self)
+
+        random_x = random() * (Window.width - self.width)
+        random_y = random() * (Window.height - self.height)
+
+        anim = Animation(x=random_x,
+                         y=random_y,
+                         duration=2,
+                         t='out_sine')
+
+        anim.start(self)
+
+    def on_touch_down(self, touch):
+        if self.collide_point(*touch.pos):
+            self.anim_to_random_pos()
+
+
+runTouchApp(Root())
