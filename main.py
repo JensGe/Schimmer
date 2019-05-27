@@ -1,11 +1,11 @@
 from kivy.app import App
 
-import android
+from plyer.notification import notify
 
 
 class AndroidApp(App):
     def build(self):
-        android.vibrate(10)
+        notify('Some title', 'Some message text')
 
 
 AndroidApp().run()
